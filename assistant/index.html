@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مساعد الالتزام</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Readex+Pro:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a calm, exact desk reference for a compliance officer — clinical, trustworthy.
+   IDEA: a regulator's ruling desk: question in, answer out with the article cited.
+   PICTURE: the working chat itself, at the top under a modest title.
+   COLOUR and TYPE: deep green ground, white, lime-white accent, coral for warnings; Readex Pro + IBM Plex Sans Arabic.
+   LAYOUT: green header band with topic chips, one calm column of conversation, sticky composer. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0c1714);--ink:light-dark(#10231f,#e8f1ec);--mute:light-dark(#55665f,#9db3a9);
+--green:#00463c;--green2:light-dark(#00463c,#0f5a4d);--lime:#e6f5c8;--coral:#ff6f59;
+--card:light-dark(#f4f8f5,#13231f);--line:light-dark(#dbe6e0,#22382f)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 "IBM Plex Sans Arabic",system-ui,sans-serif;overflow-x:clip}
+header{background:var(--green);color:#fff;padding:clamp(22px,4vw,44px) max(5vw,16px) 22px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font:700 clamp(26px,4vw,38px)/1.15 "Readex Pro",sans-serif;margin:0 0 6px;text-wrap:balance}
+header p{margin:0 0 16px;color:var(--lime);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;border:1px solid #ffffff55;background:transparent;color:#fff;border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--lime);color:var(--green);border-color:var(--lime);font-weight:700}
+.chip:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+main{padding:20px max(5vw,16px) 200px}
+.empty h2{font:600 20px/1.3 "Readex Pro",sans-serif;margin:8px 0 12px}
+.starters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.starter{font:inherit;font-size:15px;text-align:start;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;line-height:1.6}
+.starter:hover{border-color:var(--green2)}
+.msg{margin:18px 0}
+.q{background:var(--green2);color:#fff;border-radius:16px 16px 4px 16px;padding:12px 16px;margin-inline-start:auto;max-width:85%;width:fit-content;white-space:pre-wrap}
+.a{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:16px 18px}
+.a h4{font:600 16px/1.4 "Readex Pro",sans-serif;margin:14px 0 6px;color:light-dark(var(--green),var(--lime))}
+.a h4:first-child{margin-top:0}
+.a ul,.a ol{margin:6px 0;padding-inline-start:22px}.a p{margin:6px 0}
+.a strong{color:light-dark(#00342c,#fff)}
+.tools{display:flex;gap:8px;margin-top:10px}
+.tools button{font:inherit;font-size:13px;background:transparent;color:var(--mute);border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-height:36px;cursor:pointer}
+.thinking{color:var(--mute);font-size:15px}
+.err{border-color:var(--coral);color:var(--coral)}
+.composer{position:fixed;inset-inline:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px max(5vw,16px) calc(34px + env(safe-area-inset-bottom))}
+.composer .wrap{display:flex;gap:10px;align-items:flex-end}
+textarea{flex:1;font:inherit;font-size:16px;resize:none;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card);color:var(--ink);max-height:160px;min-height:48px}
+.send{font:700 16px "IBM Plex Sans Arabic",sans-serif;background:var(--green);color:#fff;border:0;border-radius:12px;padding:0 20px;height:48px;cursor:pointer}
+.send:disabled{opacity:.5;cursor:default}
+.bar{display:flex;justify-content:space-between;gap:8px;max-width:860px;margin:0 auto 8px;font-size:13px;color:var(--mute)}
+.bar button{font:inherit;font-size:13px;background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;min-height:32px}
+.note{font-size:13px;color:var(--mute);margin-top:18px}
+.off{background:var(--card);border:1px solid var(--coral);border-radius:12px;padding:14px;margin-top:14px;display:none}
+.libbtn{font:inherit;font-size:14px;margin-top:12px;background:var(--lime);color:var(--green);border:0;border-radius:10px;padding:8px 14px;min-height:40px;font-weight:700;cursor:pointer}
+.lib{background:var(--card);border-bottom:1px solid var(--line);padding:16px max(5vw,16px)}
+.lib input{width:100%;font:inherit;font-size:16px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.doc{border-bottom:1px solid var(--line);padding:12px 0}.doc:last-child{border:0}
+.doc a{color:light-dark(var(--green),var(--lime));font-weight:700;text-decoration:none}
+.doc small{display:block;color:var(--mute);font-size:13px}
+.doc ul{margin:6px 0 0;padding-inline-start:20px;font-size:14px}
+.tag{display:inline-block;font-size:12px;border-radius:6px;padding:0 6px;margin-inline-start:6px;background:var(--line)}
+.tag.live{background:#d7f0dc;color:#0b5a2a}.tag.draft{background:#ffe1d9;color:#9a2a12}.doc em{color:var(--coral);font-style:normal;font-size:13px}
+.used{font-size:13px;color:var(--mute);margin-bottom:8px}
+@media(prefers-reduced-motion:no-preference){.msg{animation:in .25s ease-out}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>مساعد الالتزام – قطاع التأمين</h1>
+<p>اسأل عن أي نظام أو لائحة أو تعميم، والجواب يجيك مع المرجع النظامي وخطوات التطبيق.</p>
+<div class="chips" id="chips"></div>
+<button class="libbtn" id="libbtn" type="button">📚 مكتبة هيئة التأمين</button>
+</div></header>
+<section class="lib" id="lib" hidden><div class="wrap">
+<input id="libq" type="search" placeholder="ابحث في اللوائح والتعاميم… مثال: إعادة التأمين" aria-label="بحث في المكتبة">
+<div id="liblist"></div>
+</div></section>
+
+<main><div class="wrap" id="log"></div>
+<div class="wrap"><div class="off" id="off">المحادثة الذكية تعمل فقط عند فتح المساعد داخل Claude. هنا تقدر تستخدم 📚 مكتبة هيئة التأمين بالكامل: البحث في اللوائح والمواد والفقرات والتعديلات.</div>
+<p class="note">الإجابات مبنية على معرفة النموذج بالأنظمة. تحقق من النص الرسمي قبل أي قرار رقابي أو تقرير.</p></div>
+</main>
+
+<div class="composer">
+<div class="bar"><span id="topicLabel">المجال: الكل</span><button id="clear" type="button">محادثة جديدة</button></div>
+<form class="wrap" id="f">
+<textarea id="q" rows="1" placeholder="اكتب سؤالك… مثال: متى يلزم رفع بلاغ اشتباه لوحدة التحريات؟" aria-label="سؤالك"></textarea>
+<button class="send" id="send" type="submit">إرسال</button>
+</form>
+</div>
+
+<script>
+{
+const TOPICS=[
+ {id:'all',t:'الكل'},
+ {id:'ia',t:'هيئة التأمين'},
+ {id:'aml',t:'غسل الأموال وتمويل الإرهاب'},
+ {id:'motor',t:'مطالبات المركبات'},
+ {id:'fraud',t:'مكافحة الاحتيال'},
+ {id:'cma',t:'هيئة السوق وتداول'},
+ {id:'co',t:'نظام الشركات'},
+ {id:'data',t:'حماية البيانات والأمن السيبراني'}
+];
+const STARTERS={
+ all:['ما الفرق بين العناية الواجبة العادية والمشددة لعملاء التأمين؟','وش التزامات إدارة الالتزام تجاه مجلس الإدارة حسب لائحة حوكمة شركات التأمين؟','اعطني checklist لمراجعة منتج تأمين جديد قبل إطلاقه','متى يلزم الإفصاح عن معلومة جوهرية على تداول وخلال كم؟'],
+ ia:['متطلبات لائحة سلوكيات السوق في التعامل مع شكاوى العملاء','شروط إسناد المهام (Outsourcing) لشركات التأمين','وش متطلبات تعيين مدير الالتزام وعدم الممانعة؟','ما الحد الأدنى لإسناد إعادة التأمين محلياً؟'],
+ aml:['متى يلزم رفع بلاغ اشتباه لوحدة التحريات وما المهلة؟','مؤشرات غسل الأموال في وثائق تأمين الحماية والادخار','متطلبات فحص قوائم العقوبات والتجميد في التأمين','مدة حفظ السجلات والمستندات حسب نظام مكافحة غسل الأموال'],
+ motor:['ما المدد النظامية لتسوية مطالبات المركبات للأفراد والشركات؟','متى يحق لشركة التأمين الرجوع على المؤمن له أو السائق؟ وما المهلة؟','اعطني checklist لاختبار التزام إدارة المطالبات بمدد التسوية','وش أسوي إذا الشركة تأخرت في التسوية؟ وما أثره الرقابي؟'],
+ fraud:['أبرز مؤشرات الاحتيال في مطالبات تأمين المركبات','متطلبات وحدة مكافحة الاحتيال في شركة التأمين','كيف أبني تقييم مخاطر الاحتيال السنوي؟','الإجراء الصحيح عند اكتشاف احتيال داخلي من موظف'],
+ cma:['التزامات الإفصاح عن صفقات الأطراف ذوي العلاقة','قيود تداول أعضاء المجلس والمطلعين وفترات الحظر','متطلبات لجنة المراجعة حسب لائحة حوكمة الشركات','وش الجديد في تعميم لقاءات مناقشة النتائج المالية؟'],
+ co:['أبرز تغييرات نظام الشركات الجديد على الشركات المساهمة','أحكام تعارض المصالح لأعضاء مجلس الإدارة','متطلبات الجمعية العامة والنصاب','مسؤولية أعضاء المجلس ودعوى المسؤولية'],
+ data:['متطلبات نظام حماية البيانات الشخصية لبيانات المؤمن لهم','نقل البيانات خارج المملكة: الشروط','الإبلاغ عن تسرب بيانات: المهلة والجهة','ضوابط الأمن السيبراني الأساسية ECC وعلاقتها بالتأمين']
+};
+const SYS=`أنت مستشار التزام أول متخصص في قطاع التأمين بالمملكة العربية السعودية، تساعد مشرف التزام أول في شركة تأمين مدرجة.
+نطاق معرفتك: نظام مراقبة شركات التأمين التعاوني ولائحته التنفيذية، أنظمة ولوائح وتعاميم هيئة التأمين (التي تولت الإشراف على القطاع من ساما ومجلس الضمان الصحي منذ 2023)، لائحة حوكمة شركات التأمين، لائحة سلوكيات السوق، لائحة مكافحة الاحتيال لشركات التأمين، لائحة الإسناد، قواعد مكافحة غسل الأموال وتمويل الإرهاب لشركات التأمين، نظام مكافحة غسل الأموال (م/20 لعام 1439هـ وتعديلاته في 2026) ولائحته التنفيذية، نظام مكافحة جرائم الإرهاب وتمويله (م/21) ولائحته، قرارات اللجنة الدائمة لمكافحة الإرهاب وقوائم العقوبات وقرارات مجلس الأمن، توصيات فاتف، نظام السوق المالية ولوائح هيئة السوق المالية (حوكمة الشركات، قواعد طرح الأوراق المالية والالتزامات المستمرة، الإفصاح)، قواعد الإدراج في تداول، نظام الشركات الجديد (م/132 لعام 1443هـ) ولوائحه، نظام حماية البيانات الشخصية، ضوابط الهيئة الوطنية للأمن السيبراني، وأنظمة نزاهة.
+نطاقك المملكة العربية السعودية فقط. لا تستشهد بأنظمة أو جهات من دول أخرى.
+
+مرجع مطالبات المركبات (معلومات موثّقة من المصادر الرسمية، اعتمد عليها):
+- المراجع: الوثيقة الموحدة للتأمين الإلزامي على المركبات (المادة السابعة: إجراءات تسوية المطالبات)، وتعليمات تسوية المطالبات التأمينية للمركبات الصادرة من البنك المركزي السعودي والمعمول بها لدى هيئة التأمين، وتعليمات ساما لعام 2016 بشأن مطالبات التأمين الإلزامي للأفراد، والوثيقة الموحدة للتأمين الإلزامي على المركبات الحكومية.
+- عند استلام المطالبة: تزوّد الشركة مقدم المطالبة بإشعار استلام وتبلغه بأي نواقص خلال 3 أيام عمل للأفراد و9 أيام عمل للشركات. ولها تعيين معاين أو مقدّر خسائر عند الحاجة خلال 3 أيام عمل للأفراد و9 للشركات.
+- مدد التسوية من تاريخ استلام المطالبة مكتملة المستندات: مطالبات الأفراد التي لا تتجاوز 2,000 ريال خلال 5 أيام عمل، ومطالبات الأفراد التي تتجاوز 2,000 ريال خلال 15 يوم عمل، ومطالبات الشركات والمؤسسات (الأشخاص الاعتباريين) خلال 45 يوم عمل. ولا تُحتسب العطلة الأسبوعية (الجمعة والسبت) ضمن المدة. هيئة التأمين أكدت هذه المدد في ردودها الرسمية عام 2026.
+- التسوية تكون بنزاهة وعدالة ودون أي مساومة. ويُسدد التعويض بالإيداع في الحساب البنكي للمستفيد عبر الآيبان، وكذلك استرداد الجزء المتبقي من القسط عند إلغاء الوثيقة.
+- الشركة ملزمة باعتماد النموذج الموحد لمطالبات التأمين الإلزامي للأفراد، وبالمستندات الموحدة والإجراءات الموحدة للتسوية.
+- الشركة ملزمة بتسوية المبالغ المقررة بناءً على تقرير الإدارة العامة للمرور أو شركة نجم لخدمات التأمين، ويُعتمد في تقدير الأضرار على منظومة تقدير. وللشركة حق معاينة المركبة وإعادة التقدير عبر وكالة أو ورشة تابعة لها.
+- الرجوع: تشعر الشركة المؤمن له أو السائق خلال 20 يوم عمل من تاريخ تقديم المطالبة إذا انطبقت إحدى حالات الرجوع، ولها ممارسة حق الرجوع خلال سنة من تاريخ تسوية المطالبة. ومن حالات الرجوع: الحادث المتعمد، وترك موقع الحادث بلا عذر، وقطع الإشارة الحمراء، والسير عكس الاتجاه، وغيرها مما ورد في الوثيقة.
+- عند التأخر بلا سبب نظامي: لمقدم المطالبة تقديم شكوى لهيئة التأمين، أو اللجوء للجان الفصل في المنازعات والمخالفات التأمينية. والتأخر يعد مخالفة رقابية، ويجب على الالتزام رصده في مؤشرات المخاطر وتقارير الشكاوى.
+- النسخ القديمة من الوثيقة (2018) استخدمت أياماً هجرية. المعمول به حالياً هو أيام العمل كما سبق. وإذا سُئلت عن تفصيل غير مذكور هنا، مثل جدول المستندات حسب نوع المطالبة أو متطلبات النظام التقني لإدارة المطالبات أو أسس الاستهلاك، فأجب بما تعرفه ونبّه إلى ضرورة الرجوع لنص التعليمات.
+
+أداة المكتبة: لديك أداة search_ia_library ترجع (documents) وثائق هيئة التأمين و(articles) موادها وفقراتها مُلخّصة من النص الرسمي: اللائحة التنفيذية لنظام المراقبة (م4–م81)، ولائحة مكافحة الاحتيال (ف1–ف53)، ولائحة الوسطاء والوكلاء، ولائحة إعادة التأمين، ووثيقة المركبات الإلزامي، وقواعد الشامل، وقواعد التقنية المالية التأمينية.
+طريقة العمل (إلزامية):
+1) قبل الإجابة ابحث 2 إلى 4 مرات بكلمات مختلفة: الموضوع، ومرادفاته، والجهة أو الوثيقة، ورقم المادة إن ذُكر (مثال: "مطالبات تسوية مدد"، "شكاوى"، "مسؤول الالتزام").
+2) في قسم "المرجع النظامي" اذكر لكل حكم: اسم الوثيقة، ورقم المادة أو الفقرة كما في reference (مثل: اللائحة التنفيذية – المادة 44 فقرة 2)، ثم مضمونها بدقة مع الأرقام والمدد كما وردت دون تغيير.
+3) أضف قسم "### المواد ذات العلاقة" تسرد فيه كل مادة أو فقرة استخدمتها بسطر: **الوثيقة – المادة/الفقرة – العنوان:** المضمون.
+4) لا تخترع أرقام مواد غير موجودة في نتائج الأداة. إن لم تجد المادة فقل ذلك صراحة وأجب من معرفتك مع التنبيه.
+5) نتائج المواد صياغة مختصرة دقيقة للنص الرسمي وليست نصاً حرفياً، فاذكر ذلك مرة واحدة في التنبيه، وأحِل للرابط الرسمي للنص الكامل.
+6) النتائج التي verified_from_official_source فيها false أو تبدأ بـ(من المعرفة العامة) نبّه إلى التحقق منها.
+8) قاعدة "السابق ثم الحالي" (إلزامية) لكل مادة لها amended_by:
+ اعرضها بهذا الترتيب حرفياً:
+ **النص السابق – [الوثيقة، المادة/الفقرة]:** previous_or_base_text
+ **حل محله / عُدّل بموجب:** amended_by (والتاريخ amendment_date)
+ **النص الحالي النافذ:** current_text
+ - إذا كان amendment_type = "مشروع": اكتب "النص النافذ حالياً" للنص الأصلي، ثم "مشروع تعديل (غير نافذ)" بدل "حل محله"، ولا تعامله كحكم ملزم.
+ - إذا كان amendment_type = "مكمّل": اكتب "أُضيف إليه بموجب" بدل "حل محله"، فالنص السابق يبقى نافذاً مع الإضافة.
+ - إذا كان "بديل لاحق" بتاريخ مستقبلي: النص السابق نافذ حتى التاريخ ثم يحل محله الجديد.
+ - إذا كان "تحقق": اعرض النص ونبّه أنه قد يكون معدلاً.
+ - وطبّق نفس الأسلوب على التعاميم: "التعميم رقم/تاريخ (السابق) ← حل محله التعميم رقم/تاريخ (الحالي)". لا تخترع أرقام تعاميم: إن لم يكن الرقم متوفراً فاكتب "رقم التعميم غير متوفر" مع التاريخ.
+ - في المرجع النظامي اكتب بجانب كل حكم حالته: (نافذ) أو (مشروع غير نافذ) أو (يسري من تاريخ…)، مع آخر تاريخ تحديث.
+ - المكتبة محدّثة حتى 23 نوفمبر 2026، وما بعده يلتقطه بوت الرصد اليومي. لا تذكر "ساما" كجهة حالية، فالجهة المختصة هيئة التأمين.
+7) قارن بين الأحكام إن تعارضت (مثل مدد المطالبات في اللائحة التنفيذية مقابل وثيقة المركبات) ووضح أيها الأخص والأحدث.
+
+قواعد الإجابة:
+- اكتب بالعربية الواضحة المباشرة، ويمكن استخدام المصطلحات الإنجليزية الشائعة بين قوسين.
+- رتّب الإجابة بهذه العناوين (كل عنوان في سطر يبدأ بـ ### ): ### الجواب المختصر ، ### التفصيل ، ### المرجع النظامي ، ### المواد ذات العلاقة ، ### خطوات التطبيق العملية ، ثم ### تنبيه إن وُجد ما يستدعي الحذر.
+- في المرجع النظامي اذكر اسم النظام أو اللائحة ورقم المادة فقط إذا كنت متأكداً. إذا لم تكن متأكداً من رقم المادة فاكتب ذلك صراحة ولا تخترع أرقاماً أو تواريخ أو تعاميم.
+- إذا كان الموضوع قد يكون تغيّر مؤخراً فنبّه إلى ضرورة التحقق من آخر نسخة على الموقع الرسمي للجهة.
+- استخدم قوائم نقطية (- ) وعبارات **عريضة** للنقاط المهمة. لا تستخدم جداول.
+- كن عملياً: ما الذي يجب على إدارة الالتزام فعله، ومن المسؤول، وما المهلة.`;
+
+let KB=[],ARTS=[];
+const norm=s=>(s||'').replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').toLowerCase();
+const toks=s=>norm(s).split(/[^\p{L}\p{N}%]+/u).map(w=>w.replace(/^(وال|بال|كال|فال|لل|ال)/,'')).filter(w=>w.length>1);
+const numsOf=s=>(norm(s).match(/\d+/g)||[]);
+function artSearch(q,n=8,doc){
+ const qt=toks(q),qn=numsOf(q);if(!qt.length&&!qn.length)return [];
+ return ARTS.filter(a=>!doc||a.d===doc).map(a=>{const D=KB.find(d=>d.id===a.d)||{t:''};const H=toks(a.h),X=toks(a.x),T=toks(D.t+' '+(D.kw||''));let s=0;
+  for(const w of qt){if(H.some(x=>x.includes(w)||w.includes(x)&&x.length>2))s+=4;if(X.some(x=>x.includes(w)))s+=1.5;if(T.some(x=>x.includes(w)))s+=1}
+  const rn=numsOf(a.r);if(qn.length&&rn.some(x=>qn.includes(x)))s+=6;
+  return {a,s}}).filter(x=>x.s>=2).sort((p,q)=>q.s-p.s).slice(0,n).map(x=>x.a);
+}
+function kbSearch(q,n=5){
+ const qt=toks(q);if(!qt.length)return [];
+ return KB.map(d=>{const T=toks(d.t),K=toks(d.kw+' '+d.cat),P=toks(d.p.join(' '));let s=0;
+  for(const w of qt){if(T.some(x=>x.includes(w)||w.includes(x)&&x.length>2))s+=3;if(K.some(x=>x.includes(w)))s+=2;if(P.some(x=>x.includes(w)))s+=1}
+  return {d,s}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.d);
+}
+const $=s=>document.querySelector(s);
+const log=$('#log'),q=$('#q'),send=$('#send');
+let topic='all',hist=[],sample,busy=false;
+try{const s=JSON.parse(localStorage.getItem('ca_hist')||'null');if(s&&Array.isArray(s.h)){hist=s.h;topic=s.t||'all'}}catch(e){}
+const save=()=>{try{localStorage.setItem('ca_hist',JSON.stringify({h:hist.slice(-30),t:topic}))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const inline=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+function md(t){
+ const out=[];let list=null;
+ const close=()=>{if(list){out.push(`</${list}>`);list=null}};
+ for(const raw of t.split('\n')){
+  const l=raw.trim();
+  if(!l){close();continue}
+  let m;
+  if(m=l.match(/^#{1,4}\s*(.+)/)){close();out.push(`<h4>${inline(m[1])}</h4>`)}
+  else if(m=l.match(/^[-*•]\s+(.+)/)){if(list!=='ul'){close();out.push('<ul>');list='ul'}out.push(`<li>${inline(m[1])}</li>`)}
+  else if(m=l.match(/^[0-9٠-٩]+[.)]\s+(.+)/)){if(list!=='ol'){close();out.push('<ol>');list='ol'}out.push(`<li>${inline(m[1])}</li>`)}
+  else{close();out.push(`<p>${inline(l)}</p>`)}
+ }
+ close();return out.join('');
+}
+function renderChips(){
+ $('#chips').innerHTML=TOPICS.map(x=>`<button class="chip" type="button" data-id="${x.id}" aria-pressed="${x.id===topic}">${x.t}</button>`).join('');
+ $('#topicLabel').textContent='المجال: '+TOPICS.find(x=>x.id===topic).t;
+}
+function render(){
+ if(!hist.length){
+  log.innerHTML=`<div class="empty"><h2>ابدأ بسؤال، أو اختر واحد من هذي:</h2><div class="starters">${STARTERS[topic].map(s=>`<button class="starter" type="button">${esc(s)}</button>`).join('')}</div></div>`;
+  return;
+ }
+ log.innerHTML=hist.map((m,i)=>m.role==='user'
+  ?`<div class="msg"><div class="q">${esc(m.content)}</div></div>`
+  :`<div class="msg"><div class="a${m.err?' err':''}" id="m${i}">${m.err?esc(m.content):md(m.content)+srcHtml(m)}${m.err?'':`<div class="tools"><button type="button" data-copy="${i}">نسخ الإجابة</button></div>`}</div></div>`).join('');
+}
+function srcHtml(m){return m.src&&m.src.length?`<h4>مصادر من مكتبة الهيئة</h4><ul>${m.src.map(s=>`<li><a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a></li>`).join('')}</ul>`:''}
+function renderLib(){
+ const v=$('#libq').value.trim();const list=v?kbSearch(v,40):KB;
+ $('#liblist').innerHTML=`<p class="used">${list.length} من ${KB.length} وثيقة</p>`+list.map(d=>`<div class="doc"><a href="${esc(d.u)}" target="_blank" rel="noopener">${esc(d.t)}</a><span class="tag">${esc(d.cat)}</span>${d.st?`<span class="tag ${/مشروع|غير نافذ/.test(d.st)?'draft':/أحدث|سارٍ/.test(d.st)?'live':''}">${esc(d.st.split(' – ')[0])}</span>`:''}${d.v?'':'<span class="tag">يحتاج تحقق</span>'}<small>${esc([d.iss,d.d,d.upd&&d.upd!==d.d?'آخر تحديث: '+d.upd:''].filter(Boolean).join(' – '))}</small>${d.st&&d.st.includes(' – ')?`<small>⚠️ ${esc(d.st.split(' – ').slice(1).join(' – '))}</small>`:''}<ul>${d.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${(()=>{const A=ARTS.filter(a=>a.d===d.id);return A.length?`<details><summary>المواد والفقرات (${A.length})</summary>${A.map(a=>`<p><strong>${esc(a.r)} – ${esc(a.h)}:</strong> ${esc(a.x)}${a.u?`<br><em>🔄 ${a.u.kind==='مشروع'?'مشروع تعديل (غير نافذ)':'حل محله / عُدّل بـ'}: ${esc(a.u.by)}${a.u.date?' – '+esc(a.u.date):''}</em><br><strong>${a.u.kind==='مشروع'?'النص المقترح':'النص الحالي'}:</strong> ${esc(a.u.new)}`:''}</p>`).join('')}</details>`:''})()}</div>`).join('');
+ if(v){const A=artSearch(v,15);if(A.length)$('#liblist').innerHTML+=`<h4>مواد مطابقة</h4>`+A.map(a=>`<div class="doc"><strong>${esc(a.r)} – ${esc(a.h)}</strong><small>${esc((KB.find(d=>d.id===a.d)||{}).t||'')}</small><p>${esc(a.x)}</p></div>`).join('')}
+}
+function scrollEnd(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
+async function ask(text){
+ text=text.trim();if(!text||busy)return;
+ if(!sample){$('#off').style.display='block';return}
+ busy=true;send.disabled=true;
+ hist.push({role:'user',content:text});
+ const clean=hist.filter(m=>!m.err).slice(-10);
+ const t=TOPICS.find(x=>x.id===topic);
+ const msgs=clean.map((m,i)=>i===0&&m.role==='user'?{role:'user',content:SYS+(topic!=='all'?`\nالمجال المختار: ${t.t}. ركّز عليه.`:'')+'\n\nالسؤال:\n'+m.content}:{role:m.role,content:m.content});
+ if(msgs[0].role!=='user')msgs.shift();
+ hist.push({role:'assistant',content:''});render();
+ const idx=hist.length-1,box=document.getElementById('m'+idx);
+ box.innerHTML='<span class="thinking">جاري التحليل…</span>';scrollEnd();
+ const b=send;b.disabled=true;
+ /* streaming: throttle redraws to one per frame; finish on promise OR on 6s of silence after text, hard stop at 150s */
+ let last='',queued=false,done=false,sec=0,idle=null;
+ const ctrl=new AbortController();
+ const tick=setInterval(()=>{sec++;if(!last)box.innerHTML=`<span class="thinking">جاري التحليل… ${sec} ث</span>`},1000);
+ const paint=()=>{queued=false;if(!done)box.innerHTML=md(last)};
+ const finish=(text,err)=>{
+  if(done)return;done=true;clearInterval(tick);clearTimeout(idle);clearTimeout(hard);
+  if(err&&!text)hist[idx]={role:'assistant',err:true,content:err};
+  else hist[idx].content=text;
+  busy=false;send.disabled=false;save();
+  const m=hist[idx];
+  box.className='a'+(m.err?' err':'');
+  const src=[...used].map(id=>KB.find(d=>d.id===id)).filter(Boolean);
+  if(!m.err&&src.length)m.src=src.map(d=>({t:d.t,u:d.u}));save();
+  box.innerHTML=m.err?esc(m.content):md(m.content)+srcHtml(m)+`<div class="tools"><button type="button" data-copy="${idx}">نسخ الإجابة</button></div>`;
+ };
+ const hard=setTimeout(()=>{ctrl.abort();finish(last,'استغرق الرد وقت طويل، جرّب مرة ثانية أو اختصر السؤال.')},150000);
+ const used=new Set();
+ const tools=KB.length?[{name:'search_ia_library',
+  description:'يبحث في مكتبة لوائح وقواعد وتعاميم وقرارات هيئة التأمين السعودية (عناوين، تواريخ، روابط رسمية، أهم الأحكام). استدعها قبل الإجابة عن أي سؤال يخص هيئة التأمين، وأكثر من مرة بكلمات مختلفة إذا لزم.',
+  inputSchema:{type:'object',properties:{query:{type:'string',description:'كلمات البحث بالعربية'}},required:['query']},
+  execute:({query})=>{clearTimeout(idle);box.innerHTML=(last?md(last):'')+`<p class="thinking">🔎 يبحث في مكتبة الهيئة: ${esc(query)}</p>`;
+   const r=kbSearch(query),a=artSearch(query);r.forEach(d=>used.add(d.id));a.forEach(x=>used.add(x.d));
+   if(!r.length&&!a.length)return 'لا توجد نتائج في المكتبة لهذه الكلمات. جرّب مرادفات أو كلمات أخرى، أو أجب من معرفتك مع التنبيه.';
+   return {documents:r.sort((x,y)=>String(y.upd||y.d).localeCompare(String(x.upd||x.d))).map(d=>({title:d.t,category:d.cat,issue_date:d.d,last_update:d.upd,status:d.st,issuer:d.iss,url:d.u,verified_from_official_source:!!d.v,key_points:d.p})),
+    articles:a.map(x=>{const D=KB.find(d=>d.id===x.d)||{};return {document:D.t,document_status:D.st,reference:x.r,heading:x.h,url:D.u,...(x.u?{previous_or_base_text:x.x,amended_by:x.u.by,amendment_date:x.u.date,amendment_type:x.u.kind,current_text:x.u.new}:{current_text:x.x,amendment:'لا يوجد تعديل معروف حتى 2026-11-23'})}})};}}]:undefined;
+ sample(msgs,{cache:false,modelTier:'complex',signal:ctrl.signal,tools,onText:({text})=>{
+   if(done||!text||text.startsWith('Thinking'))return;
+   last=text;if(!queued){queued=true;requestAnimationFrame(paint)}
+   clearTimeout(idle);idle=setTimeout(()=>finish(last),15000);
+ }})
+ .then(r=>finish((r&&r.text||last)+(r&&r.truncated?'\n\n(الإجابة طويلة وانقطعت، اكتب "كمّل")':'')))
+ .catch(e=>finish(last,e&&e.code==='rate_limited'?'وصلت للحد المسموح مؤقتاً، جرّب بعد دقائق.':e&&e.code==='not_granted'?'لم تُمنح صلاحية السؤال. وافق على الطلب ثم أعد المحاولة.':'صار خطأ، جرّب مرة ثانية.'));
+}
+$('#chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;topic=b.dataset.id;renderChips();save();if(!hist.length)render()});
+log.addEventListener('click',async e=>{
+ const s=e.target.closest('.starter');if(s){ask(s.textContent);return}
+ const c=e.target.closest('[data-copy]');
+ if(c){try{await navigator.clipboard.writeText(hist[+c.dataset.copy].content);c.textContent='تم النسخ'}catch(err){c.textContent='تعذّر النسخ'}}
+});
+$('#f').addEventListener('submit',e=>{e.preventDefault();const v=q.value;q.value='';q.style.height='';ask(v)});
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#f').requestSubmit()}});
+q.addEventListener('input',()=>{q.style.height='auto';q.style.height=Math.min(q.scrollHeight,160)+'px'});
+$('#clear').addEventListener('click',()=>{hist=[];save();render()});
+$('#libbtn').addEventListener('click',()=>{const l=$('#lib');l.hidden=!l.hidden;if(!l.hidden){renderLib();$('#libq').focus()}});
+$('#libq').addEventListener('input',renderLib);
+fetch('arts.json').then(r=>r.json()).then(j=>{ARTS=j}).catch(()=>{});
+fetch('kb.json').then(r=>r.json()).then(j=>{KB=j;$('#libbtn').textContent=`📚 مكتبة هيئة التأمين (${KB.length})`}).catch(()=>{$('#libbtn').hidden=true});
+renderChips();render();
+if(window.claude&&claude.use){claude.use('sample').then(s=>{sample=s;if(!s)$('#off').style.display='block'}).catch(()=>{$('#off').style.display='block'})}
+else $('#off').style.display='block';
+}
+</script>
+</body>
+</html>
