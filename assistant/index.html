@@ -157,7 +157,7 @@ const SYS=`أنت مستشار التزام أول متخصص في قطاع ال
 - استخدم قوائم نقطية (- ) وعبارات **عريضة** للنقاط المهمة. لا تستخدم جداول.
 - كن عملياً: ما الذي يجب على إدارة الالتزام فعله، ومن المسؤول، وما المهلة.`;
 
-let KB=[],ARTS=[];
+let KB=[],ARTS=[],UPD=[];
 const norm=s=>(s||'').replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').toLowerCase();
 const toks=s=>norm(s).split(/[^\p{L}\p{N}%]+/u).map(w=>w.replace(/^(وال|بال|كال|فال|لل|ال)/,'')).filter(w=>w.length>1);
 const numsOf=s=>(norm(s).match(/\d+/g)||[]);
@@ -211,7 +211,7 @@ function render(){
 function srcHtml(m){return m.src&&m.src.length?`<h4>مصادر من مكتبة الهيئة</h4><ul>${m.src.map(s=>`<li><a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a></li>`).join('')}</ul>`:''}
 function renderLib(){
  const v=$('#libq').value.trim();const list=v?kbSearch(v,40):KB;
- $('#liblist').innerHTML=`<p class="used">${list.length} من ${KB.length} وثيقة</p>`+list.map(d=>`<div class="doc"><a href="${esc(d.u)}" target="_blank" rel="noopener">${esc(d.t)}</a><span class="tag">${esc(d.cat)}</span>${d.st?`<span class="tag ${/مشروع|غير نافذ/.test(d.st)?'draft':/أحدث|سارٍ/.test(d.st)?'live':''}">${esc(d.st.split(' – ')[0])}</span>`:''}${d.v?'':'<span class="tag">يحتاج تحقق</span>'}<small>${esc([d.iss,d.d,d.upd&&d.upd!==d.d?'آخر تحديث: '+d.upd:''].filter(Boolean).join(' – '))}</small>${d.st&&d.st.includes(' – ')?`<small>⚠️ ${esc(d.st.split(' – ').slice(1).join(' – '))}</small>`:''}<ul>${d.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${(()=>{const A=ARTS.filter(a=>a.d===d.id);return A.length?`<details><summary>المواد والفقرات (${A.length})</summary>${A.map(a=>`<p><strong>${esc(a.r)} – ${esc(a.h)}:</strong> ${esc(a.x)}${a.u?`<br><em>🔄 ${a.u.kind==='مشروع'?'مشروع تعديل (غير نافذ)':'حل محله / عُدّل بـ'}: ${esc(a.u.by)}${a.u.date?' – '+esc(a.u.date):''}</em><br><strong>${a.u.kind==='مشروع'?'النص المقترح':'النص الحالي'}:</strong> ${esc(a.u.new)}`:''}</p>`).join('')}</details>`:''})()}</div>`).join('');
+ $('#liblist').innerHTML=(UPD.length?`<details class="used"><summary>🔄 آخر تحديث للمكتبة: ${esc(UPD[0].date)}</summary>${UPD.slice(0,8).map(u=>`<p><strong>${esc(u.date)}</strong> (${esc(u.source||'')}): ${u.items.map(esc).join(' • ')}</p>`).join('')}</details>`:'')+`<p class="used">${list.length} من ${KB.length} وثيقة</p>`+list.map(d=>`<div class="doc"><a href="${esc(d.u)}" target="_blank" rel="noopener">${esc(d.t)}</a><span class="tag">${esc(d.cat)}</span>${d.st?`<span class="tag ${/مشروع|غير نافذ/.test(d.st)?'draft':/أحدث|سارٍ/.test(d.st)?'live':''}">${esc(d.st.split(' – ')[0])}</span>`:''}${d.v?'':'<span class="tag">يحتاج تحقق</span>'}<small>${esc([d.iss,d.d,d.upd&&d.upd!==d.d?'آخر تحديث: '+d.upd:''].filter(Boolean).join(' – '))}</small>${d.st&&d.st.includes(' – ')?`<small>⚠️ ${esc(d.st.split(' – ').slice(1).join(' – '))}</small>`:''}<ul>${d.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${(()=>{const A=ARTS.filter(a=>a.d===d.id);return A.length?`<details><summary>المواد والفقرات (${A.length})</summary>${A.map(a=>`<p><strong>${esc(a.r)} – ${esc(a.h)}:</strong> ${esc(a.x)}${a.u?`<br><em>🔄 ${a.u.kind==='مشروع'?'مشروع تعديل (غير نافذ)':'حل محله / عُدّل بـ'}: ${esc(a.u.by)}${a.u.date?' – '+esc(a.u.date):''}</em><br><strong>${a.u.kind==='مشروع'?'النص المقترح':'النص الحالي'}:</strong> ${esc(a.u.new)}`:''}</p>`).join('')}</details>`:''})()}</div>`).join('');
  if(v){const A=artSearch(v,15);if(A.length)$('#liblist').innerHTML+=`<h4>مواد مطابقة</h4>`+A.map(a=>`<div class="doc"><strong>${esc(a.r)} – ${esc(a.h)}</strong><small>${esc((KB.find(d=>d.id===a.d)||{}).t||'')}</small><p>${esc(a.x)}</p></div>`).join('')}
 }
 function scrollEnd(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
@@ -274,6 +274,7 @@ q.addEventListener('input',()=>{q.style.height='auto';q.style.height=Math.min(q.
 $('#clear').addEventListener('click',()=>{hist=[];save();render()});
 $('#libbtn').addEventListener('click',()=>{const l=$('#lib');l.hidden=!l.hidden;if(!l.hidden){renderLib();$('#libq').focus()}});
 $('#libq').addEventListener('input',renderLib);
+fetch('updates.json').then(r=>r.json()).then(j=>{UPD=j.sort((a,b)=>String(b.date).localeCompare(String(a.date)))}).catch(()=>{});
 fetch('arts.json').then(r=>r.json()).then(j=>{ARTS=j}).catch(()=>{});
 fetch('kb.json').then(r=>r.json()).then(j=>{KB=j;$('#libbtn').textContent=`📚 مكتبة هيئة التأمين (${KB.length})`}).catch(()=>{$('#libbtn').hidden=true});
 renderChips();render();
